@@ -1,6 +1,7 @@
 package com.MBank.Secure.Banking.Application.service.impl;
 
 import com.MBank.Secure.Banking.Application.dto.EmailDetails;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -10,13 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailServiceImpl implements EmailService {
 
-    private final JavaMailSender javaMailSender;
+    @Autowired
+    private JavaMailSender javaMailSender;
     @Value("${spring.mail.username}")
     private String sendeEmail;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
 
     @Override
     public void sendEmailAlert(EmailDetails emailDetails) {
