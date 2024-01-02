@@ -2,20 +2,24 @@ package com.MBank.Secure.Banking.Application.service.impl;
 
 import com.MBank.Secure.Banking.Application.dto.AccountInfo;
 import com.MBank.Secure.Banking.Application.dto.BankResponse;
+import com.MBank.Secure.Banking.Application.dto.EmailDetails;
 import com.MBank.Secure.Banking.Application.dto.UserRequest;
 import com.MBank.Secure.Banking.Application.entity.User;
 import com.MBank.Secure.Banking.Application.repository.UserRepository;
 import com.MBank.Secure.Banking.Application.utils.AccountUtils;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.math.BigDecimal;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, EmailService emailService) {
         this.userRepository = userRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -46,6 +50,14 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         User saveUser=userRepository.save(newUser);
+        EmailDetails details= EmailDetails.builder()
+                .messageBody("Congratulations! Your Account Has Been Successfully Created.\n Your Account Details :"+
+                        "Account Name: "+ saveUser.getFirstName()+" " + saveUser.getLastName()
+                        )
+                .recipient(userRequest.getEmail())
+                .subject("ACCOUNT CREATION")
+                .build();
+        emailService.sendEmailAlert(details);
         return BankResponse.builder()
                 .responseCode(AccountUtils.ACCOUNT_CREATION_CODE)
                 .responseMessage(AccountUtils.ACCOUNT_CREATION_MESSAGE)
